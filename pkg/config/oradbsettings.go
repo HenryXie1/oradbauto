@@ -9,7 +9,7 @@ var (
 	# delete oracle db  statefulset with label app=peoradbauto details in the OKE cluster. 
 	# Data won't be deleted.PV and PVC are kept in OKE
 	kubectl-oradb delete -c cdbname
-	# list oracle db  statefulset with label app=peoradbauto details in the OKE cluster
+	# list oracle db statefulset with label app=peoradbauto details in the OKE cluster
 	kubectl-oradb list 
 	`
 	OradbStsyml = `
