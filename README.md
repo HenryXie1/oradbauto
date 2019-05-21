@@ -14,9 +14,8 @@ It leverages advantages of  OKE  and kubectl, we can deploy it from laptop or RU
 ![Demo!](https://i.imgur.com/ca1MLkY.gif)
 
 ## Installation
-Installation 
 
-    kubectl krew install sniff
+Download binary from [release link](https://github.com/HenryXie1/oradbauto/releases/download/v1.0/kubectl-oradb)
     
 ### Usage
 ```
