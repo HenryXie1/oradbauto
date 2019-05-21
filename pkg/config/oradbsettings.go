@@ -5,10 +5,10 @@ var (
 	# 
 	#create oracle db 19c statefulset with label app=peoradbauto details in the OKE cluster
 	#so far we support oracle db 19.2 , new db versions can be added later
-	kubectl-apex create -c cdbname -p pdbname -w syspassword 
+	kubectl-oradb create -c cdbname -p pdbname -w syspassword 
 	# delete oracle db  statefulset with label app=peoradbauto details in the OKE cluster. 
-	# Data won't be deleted automatically.PV and PVC are kept in OKE
-	kubectl-apex delete -c cdbname
+	# Data won't be deleted.PV and PVC are kept in OKE
+	kubectl-oradb delete -c cdbname
 	# list oracle db  statefulset with label app=peoradbauto details in the OKE cluster
 	kubectl-oradb list 
 	`
