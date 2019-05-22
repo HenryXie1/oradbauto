@@ -153,10 +153,16 @@ func (o *OradbOperations) Complete(cmd *cobra.Command, args []string) error {
 		o.oradbsts.ObjectMeta.Name = o.UserSpecifiedCdbname 
 		o.oradbsts.ObjectMeta.Namespace = o.UserSpecifiedNamespace
 		
+		//Update selector
+		var oradbselector =  map[string]string {
+			"oradbsts":o.UserSpecifiedCdbname + "StsSelector",
+		}
+		o.oradbsts.Spec.Selector.MatchLabels = oradbselector
 		//Update ORACLE_SID ,ORACLE_PDB,ORACLE_PWD
 		o.oradbsts.Spec.Template.Spec.Containers[0].Env[0].Value = strings.ToUpper(o.UserSpecifiedCdbname)
 		o.oradbsts.Spec.Template.Spec.Containers[0].Env[1].Value = o.UserSpecifiedPdbname
 		o.oradbsts.Spec.Template.Spec.Containers[0].Env[2].Value = o.UserSpecifiedSyspassword
+		o.oradbsts.Spec.Template.ObjectMeta.Labels = oradbselector
     //update volume mouth and template name
 		oradbvolname := o.UserSpecifiedCdbname + "-db-pv-storage"
 		o.oradbsts.Spec.Template.Spec.Containers[0].VolumeMounts[0].Name = oradbvolname
@@ -171,6 +177,7 @@ func (o *OradbOperations) Complete(cmd *cobra.Command, args []string) error {
 		o.oradbsvc = obj.(*corev1.Service)
 		o.oradbsvc.ObjectMeta.Name = o.UserSpecifiedCdbname + "-svc"
 		o.oradbsvc.ObjectMeta.Namespace = o.UserSpecifiedNamespace
+		o.oradbsvc.Spec.Selector = oradbselector
 
 		//Update nodeport service name
 		obj, _, err = decode([]byte(config.OradbSvcymlnodeport), nil, nil)
@@ -180,6 +187,7 @@ func (o *OradbOperations) Complete(cmd *cobra.Command, args []string) error {
 		o.oradbsvcnodeport = obj.(*corev1.Service)
 		o.oradbsvcnodeport.ObjectMeta.Name = o.UserSpecifiedCdbname + "-svc-nodeport"
 		o.oradbsvcnodeport.ObjectMeta.Namespace = o.UserSpecifiedNamespace
+		o.oradbsvcnodeport.Spec.Selector = oradbselector
 
 		//find a host IP address for nodeport service connections
 		NodeStatus, err := o.clientset.CoreV1().Nodes().List(metav1.ListOptions{})
