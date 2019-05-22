@@ -17,7 +17,7 @@ It leverages advantages of  OKE  and kubectl, we can deploy it from laptop or RU
 
 Download kubectl via [official guide](https://kubernetes.io/docs/tasks/tools/install-kubectl/) and configure access for your kubernetes cluster. Confirm kubectl get nodes is working
 Download binary from [release link](https://github.com/HenryXie1/oradbauto/releases/download/v1.0/kubectl-oradb)
-    
+Save it to /usr/local/bin of linux box (only linux supported as for now), No installation needed, download and run   
 ### Usage
 ```
 kubectl-oradb list|create|delete [-c cdbname] [-p pdbname] [-w syspassword] [-n namespace] [flags]
