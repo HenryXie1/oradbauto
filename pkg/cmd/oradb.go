@@ -182,7 +182,8 @@ func (o *OradbOperations) Complete(cmd *cobra.Command, args []string) error {
 		//find a host IP address for nodeport service connections
 		NodeStatus, err := o.clientset.CoreV1().Nodes().List(metav1.ListOptions{})
 	  if err != nil {
-	   	panic(err)
+			fmt.Println(err)
+			return nil
   	} 
   	o.OraDbhostip = NodeStatus.Items[0].Status.Addresses[0].Address
     //fmt.Printf("ststatus: %v\n",o.OraDbhostip)
@@ -242,7 +243,8 @@ func ListOption(o *OradbOperations) {
 			Limit:         100,
 		})
 				if err != nil {
-						panic(err.Error())
+					fmt.Println(err)
+					return 
 		}
 	if 	len(stsclient.Items) == 0 {
 		fmt.Printf("Didn't found Oracle DB statefulset with label app=peoradbauto \n")
@@ -268,7 +270,8 @@ func DeleteDbOption(o *OradbOperations) {
 	}
 	list, err := Stsclient.List(listOptions)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return 
 	}
 	
 	if len(list.Items) == 0 {
@@ -282,7 +285,8 @@ func DeleteDbOption(o *OradbOperations) {
     if err := Stsclient.DeleteCollection(&metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	    },listOptions); err != nil {
-		panic(err)
+				fmt.Println(err)
+				return 
 	}
 	fmt.Printf("Deleted DB statefulsets in namespace %v.\nData in PV is reserved.\n",o.UserSpecifiedNamespace)
 }
@@ -299,7 +303,8 @@ func DeleteSvcOption(o *OradbOperations) {
 	}
 	list, err := Svcclient.List(listOptions)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return 
 	}
 	
 	if len(list.Items) == 0 {
@@ -313,7 +318,8 @@ func DeleteSvcOption(o *OradbOperations) {
     if err := Svcclient.Delete(o.UserSpecifiedCdbname + "-svc", &metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	    }); err != nil {
-		panic(err)
+				fmt.Println(err)
+				return 
 	}
 	fmt.Printf("Deleted services in namespace %v.\n",o.UserSpecifiedNamespace)
 	
@@ -331,7 +337,8 @@ func DeleteSvcNodeportOption(o *OradbOperations) {
 	}
 	list, err := Svcclient.List(listOptions)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return 
 	}
 	
 	if len(list.Items) == 0 {
@@ -345,7 +352,8 @@ func DeleteSvcNodeportOption(o *OradbOperations) {
     if err := Svcclient.Delete(o.UserSpecifiedCdbname + "-svc-nodeport", &metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	    }); err != nil {
-		panic(err)
+				fmt.Println(err)
+				return 
 	}
 	fmt.Printf("Deleted services in namespace %v.\n",o.UserSpecifiedNamespace)
 	
@@ -358,7 +366,8 @@ func CreateDbOption(o *OradbOperations) {
 	Stsclient := o.clientset.AppsV1().StatefulSets(o.UserSpecifiedNamespace)
     result, err := Stsclient.Create(o.oradbsts)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return 
 	}
 	fmt.Printf("Created Oracle CDB %q. Use kubectl logs -f %v-0 to see alert logs\n", result.GetObjectMeta().GetName(),o.UserSpecifiedCdbname)
 	
@@ -370,7 +379,8 @@ func CreateSvcOption(o *OradbOperations) {
 	Svcclient := o.clientset.CoreV1().Services(o.UserSpecifiedNamespace)
     result, err := Svcclient.Create(o.oradbsvc)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return 
 	}
 	fmt.Printf("Created service %q.\n", result.GetObjectMeta().GetName())
 	fmt.Printf("connect from inside K8S: system/%v@%v:1521/%v \n\n",o.UserSpecifiedSyspassword,result.GetObjectMeta().GetName(),o.UserSpecifiedPdbname)
@@ -379,7 +389,8 @@ func CreateSvcOption(o *OradbOperations) {
 	fmt.Printf("Creating service to serve outside K8S in namespace %v...\n",o.UserSpecifiedNamespace)
 	result, err = Svcclient.Create(o.oradbsvcnodeport)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return 
 	}
 	fmt.Printf("Created service %q.\n", result.GetObjectMeta().GetName())
 	fmt.Printf("connect from outside K8S(ie laptop): system/%v@%v:%v/%v \n\n",o.UserSpecifiedSyspassword, o.OraDbhostip ,result.Spec.Ports[0].NodePort,o.UserSpecifiedPdbname)
