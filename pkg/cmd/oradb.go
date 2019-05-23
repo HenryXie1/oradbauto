@@ -235,7 +235,7 @@ func (o *OradbOperations) Run() error {
 return nil
 }
 
-func ListOption(o *OradbOperations) {
+func ListOption(o *OradbOperations) error{
 	
 	if o.UserSpecifiedList {
 		stsclient, err := o.clientset.AppsV1().StatefulSets("").List(metav1.ListOptions{
@@ -244,21 +244,22 @@ func ListOption(o *OradbOperations) {
 		})
 				if err != nil {
 					fmt.Println(err)
-					return 
+					return err
 		}
 	if 	len(stsclient.Items) == 0 {
 		fmt.Printf("Didn't found Oracle DB statefulset with label app=peoradbauto \n")
-		return
+		return nil
 	} else {
 	for i := 0;i < len(stsclient.Items);i++ {
 		fmt.Printf("Found %v statefulset with label app=peoradbauto in namespace %v\n", stsclient.Items[i].ObjectMeta.Name,stsclient.Items[i].ObjectMeta.Namespace)
 		 }
-	}
+	 }
 }
+return nil
 }
 
 
-func DeleteDbOption(o *OradbOperations) {
+func DeleteDbOption(o *OradbOperations) error{
 	
   fmt.Printf("Deleting DB Statefulsets with label app=peoradbauto in namespace %v...\n",o.UserSpecifiedNamespace)
 	Stsclient := o.clientset.AppsV1().StatefulSets(o.UserSpecifiedNamespace)
@@ -271,12 +272,12 @@ func DeleteDbOption(o *OradbOperations) {
 	list, err := Stsclient.List(listOptions)
 	if err != nil {
 		fmt.Println(err)
-		return 
+		return err
 	}
 	
 	if len(list.Items) == 0 {
 		fmt.Println("No statefulsets found\n")
-		return
+		return nil
 	} else {
 	for _, d := range list.Items {
 		fmt.Printf(" * %s \n", d.Name)
@@ -286,12 +287,13 @@ func DeleteDbOption(o *OradbOperations) {
 		PropagationPolicy: &deletePolicy,
 	    },listOptions); err != nil {
 				fmt.Println(err)
-				return 
+				return err
 	}
 	fmt.Printf("Deleted DB statefulsets in namespace %v.\nData in PV is reserved.\n",o.UserSpecifiedNamespace)
+	return nil
 }
 
-func DeleteSvcOption(o *OradbOperations) {
+func DeleteSvcOption(o *OradbOperations) error{
 	
   fmt.Printf("Deleting services with label app=peoradbauto in namespace %v...\n",o.UserSpecifiedNamespace)
 	Svcclient := o.clientset.CoreV1().Services(o.UserSpecifiedNamespace)
@@ -304,12 +306,12 @@ func DeleteSvcOption(o *OradbOperations) {
 	list, err := Svcclient.List(listOptions)
 	if err != nil {
 		fmt.Println(err)
-		return 
+		return err
 	}
 	
 	if len(list.Items) == 0 {
 		fmt.Println("No Services found")
-		return
+		return nil
 	} else {
 	for _, d := range list.Items {
 		fmt.Printf(" * %s \n", d.Name)
@@ -319,13 +321,14 @@ func DeleteSvcOption(o *OradbOperations) {
 		PropagationPolicy: &deletePolicy,
 	    }); err != nil {
 				fmt.Println(err)
-				return 
+				return err
 	}
 	fmt.Printf("Deleted services in namespace %v.\n",o.UserSpecifiedNamespace)
-	
+	return nil
+
 }
 
-func DeleteSvcNodeportOption(o *OradbOperations) {
+func DeleteSvcNodeportOption(o *OradbOperations) error{
 	
   fmt.Printf("Deleting NodePort services with label app=peoradbauto in namespace %v...\n",o.UserSpecifiedNamespace)
 	Svcclient := o.clientset.CoreV1().Services(o.UserSpecifiedNamespace)
@@ -338,12 +341,12 @@ func DeleteSvcNodeportOption(o *OradbOperations) {
 	list, err := Svcclient.List(listOptions)
 	if err != nil {
 		fmt.Println(err)
-		return 
+		return err
 	}
 	
 	if len(list.Items) == 0 {
 		fmt.Println("No NodePort Services found")
-		return
+		return nil
 	} else {
 	for _, d := range list.Items {
 		fmt.Printf(" * %s \n", d.Name)
@@ -353,34 +356,34 @@ func DeleteSvcNodeportOption(o *OradbOperations) {
 		PropagationPolicy: &deletePolicy,
 	    }); err != nil {
 				fmt.Println(err)
-				return 
+				return err
 	}
 	fmt.Printf("Deleted services in namespace %v.\n",o.UserSpecifiedNamespace)
-	
+	return nil
 }
 
 
-func CreateDbOption(o *OradbOperations) {
+func CreateDbOption(o *OradbOperations) error{
 	
 	fmt.Printf("Creating Oracle CDB %v and PDB %v in namespace %v...\n",o.UserSpecifiedCdbname,o.UserSpecifiedPdbname,o.UserSpecifiedNamespace)
 	Stsclient := o.clientset.AppsV1().StatefulSets(o.UserSpecifiedNamespace)
     result, err := Stsclient.Create(o.oradbsts)
 	if err != nil {
 		fmt.Println(err)
-		return 
+		return err
 	}
 	fmt.Printf("Created Oracle CDB %q. Use kubectl logs -f %v-0 to see alert logs\n", result.GetObjectMeta().GetName(),o.UserSpecifiedCdbname)
-	
+	return nil
 }
 
-func CreateSvcOption(o *OradbOperations) {
+func CreateSvcOption(o *OradbOperations) error{
 	
 	fmt.Printf("Creating service to serve inside K8S in namespace %v...\n",o.UserSpecifiedNamespace)
 	Svcclient := o.clientset.CoreV1().Services(o.UserSpecifiedNamespace)
     result, err := Svcclient.Create(o.oradbsvc)
 	if err != nil {
 		fmt.Println(err)
-		return 
+		return err
 	}
 	fmt.Printf("Created service %q.\n", result.GetObjectMeta().GetName())
 	fmt.Printf("connect from inside K8S: system/%v@%v:1521/%v \n\n",o.UserSpecifiedSyspassword,result.GetObjectMeta().GetName(),o.UserSpecifiedPdbname)
@@ -390,10 +393,10 @@ func CreateSvcOption(o *OradbOperations) {
 	result, err = Svcclient.Create(o.oradbsvcnodeport)
 	if err != nil {
 		fmt.Println(err)
-		return 
+		return err
 	}
 	fmt.Printf("Created service %q.\n", result.GetObjectMeta().GetName())
 	fmt.Printf("connect from outside K8S(ie laptop): system/%v@%v:%v/%v \n\n",o.UserSpecifiedSyspassword, o.OraDbhostip ,result.Spec.Ports[0].NodePort,o.UserSpecifiedPdbname)
 	fmt.Printf("Please Wait about 8-20 min then CDB&PDB are fully up. Use kubectl logs -f %v-0 to see alert logs\n",o.UserSpecifiedCdbname)
-	
+	return nil
 }
