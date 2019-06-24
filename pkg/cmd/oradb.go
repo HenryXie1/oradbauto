@@ -306,7 +306,7 @@ func DeleteSvcOption(o *OradbOperations) error{
 	list, err := Svcclient.List(listOptions)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		
 	}
 	
 	if len(list.Items) == 0 {
@@ -341,7 +341,7 @@ func DeleteSvcNodeportOption(o *OradbOperations) error{
 	list, err := Svcclient.List(listOptions)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		
 	}
 	
 	if len(list.Items) == 0 {
@@ -363,7 +363,7 @@ func DeleteSvcNodeportOption(o *OradbOperations) error{
 }
 
 
-func CreateDbOption(o *OradbOperations) error{
+func CreateDbOption(o *OradbOperations) error {
 	
 	fmt.Printf("Creating Oracle CDB %v and PDB %v in namespace %v...\n",o.UserSpecifiedCdbname,o.UserSpecifiedPdbname,o.UserSpecifiedNamespace)
 	Stsclient := o.clientset.AppsV1().StatefulSets(o.UserSpecifiedNamespace)

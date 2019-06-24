@@ -34,7 +34,7 @@ spec:
          runAsUser: 54321
          fsGroup: 54321
       containers:
-        - image: iad.ocir.io/espsocicorpnonprod/autostg/database:19.2
+        - image: iad.ocir.io/espsnonprodint/autostg/database:19.2v3
           name: oradbauto
           ports:
             - containerPort: 1521
